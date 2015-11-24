@@ -1,0 +1,189 @@
+Certificate in Business Analytics Programme
+2015-16
+
+Capstone Project Charter
+
+ 
+PROJECT DESCRIPTION
+
+Name of the Client	Deloitte
+Project Title	Trend Analysis Of Securities Based On Market Sentiments through Financial News
+Project Team	Abhishek Khanna
+Sonu Krishnan
+Sumit Janmejai
+Client Mentor	Mr. Chandra Narra,
+Sr. Manager, Advanced Analytics Enablement, 
+Information Management
+Faculty Advisor	TBD
+Project Team 
+Contact Details	abhishek_khanna_2015@cba.isb.edu; 7795209972
+sonu_krishnan_2015@cba.isb.edu; 9923697129
+sumit_janmejai_2015@cba.isb.edu; 8698421555
+Venkata_mohan_2015@cba.isb.edu; 9963993519
+
+Client Mentor Contact Details	
+Office Line: 040-66705689
+Mobile: 
+Official Email: cnarra@deloitte.com
+
+Faculty Advisor Contact Details	Prof. TBD
+
+Email: 
+Project Description 
+(as per PD form)	This project aims to use statistical and analytical tools to perform Text Analytics on the Market Data, Financial News, General Online News and Social Media feeds from the web to perform the following:
+
+1.	Sentiment mapping for each stock/sector/benchmark
+2.	Overall market trends related to News
+3.	Real Time News aggregation and clustering for any stock or sector as a whole.
+4.	Visualizations and dashboards complimenting the above
+
+
+
+
+PROJECT PLANNING
+Business Issue  
+-	Business Context
+News from various parts of the world has a strong relationship with the market (investor) sentiments as markets react sharply and promptly to the news and the sentiment they carry. Effective models that incorporate news data are required by all investors (be it Fund Houses, Brokers or Investment Managers). It is not limited to the Trading and Portfolio management but also Risk Control. The idea behind News Analytics is to automate Human Thinking and Reasoning to come up with a quantifiable model and enable users with the decisive capability to predict gains or control risk.
+
+-	Area of impact
+Online News websites and Social Media carry close to real-time information with them. Along with the televised news, these sources of news carry bit of sentiment trend along with the news content which together influence the overall investor sentiment over a particular stock or sector. This project aims to tap in that hidden sentiment in news through the application of various Data Mining and Sentiment Analysis techniques. 
+Gap Analysis 
+ 
+
+Project Workflow:
+
+Phase 1: Exploratory analysis and data collection
+o	Identify the markets / indices and industry / sector and specific securities of interest
+o	Identify various sources of financial and generic news. Shortlist a few news channels and social media content to be used in the project like Yahoo News, MSN News, Twitter, etc.
+o	Procure the data from the shortlisted sources above.
+
+Phase 2: Data Cleansing and Mining 
+o	Cleansing the unstructured data through the application techniques and consolidating all the data into respective buckets depending on security and sector for analysis
+o	Application of various text analytics techniques to understand the hidden meaning in the data and calculating a sentiment score using specific custom built-in dictionaries.
+
+Phase 3: Model building and validation
+o	Data partitioning into Training and Validation data sets
+o	Running Naïve Bayes classifier on the text
+o	Building the model
+o	Model validation
+Deliverables:
+
+Phase 1:
+o	Data sourcing scripts in R
+o	Data cleansing scripts
+o	Documentation of usage
+o	Bi-Weekly status report
+Phase 2:
+o	Cleansing Scripts, Sentiment Analysis scripts
+o	Custom data dictionaries built for a few sample securities
+o	Documentation
+o	Bi-weekly status report
+Phase 3:
+o	Model script
+o	Bi-weekly status report
+o	Final project report and presentation
+
+
+
+
+Software Requirement: 
+
+-	R: Data Collection and Analysis
+-	Python: Data Collection and Analysis
+-	MongoDB: Database Management
+-	Tableau: Data Visualization
+Project Management: 
+
+Deliverable	Start Date	End Date	Key Analysis Parameters	Data Sources	Outcome expected	Team Member Responsible
+Scripts for data collection and storage	1 Nov 2015	15 Nov 2015	High coverage, minimum latency	Twitter, Google News and more	Data Scrapping mechanism that collects news at near real time and stores in HDFS	Abhishek Khanna, Sumit Janmejai
+Finalized model script, validation results, performance testing results	15 Nov 2015	25 Dec 2015	Accuracy in sentiment classification, key topics identification	Twitter, Google News and more , Training data set, 	Aggregate Sentiment score that reflects market propensity to buy/sell a stock  	Sumit Janmejai, Abhishek Khana
+Visualization Dashboard	25 Dec 2015	15 Jan 2016	Interactivity, Intuitiveness, 	Twitter, Google News and more; 
+Stock Market data	An Interactive dashboard that provides a user with insights related to market reaction to a stock	Sonu Krishnan, Venkat Pilla
+Project Report	1 Nov 2015	25 Jan, 2016	Scientific approach / methodology to problem solving		An academic report that details methodology followed, tools used, techniques involved in analysis, scope and limitations of the study, and the rationale of tasks	Abhishek Khanna, Sumit Janmejai, Sonu Krishnan, Venkat Pilla
+
+Governance: 
+The team will send update emails every fortnightly to CBA programme office. Each update will contain brief summary of progress during the time and key insights that have been revealed. Other key interactions include fortnightly teleconference.
+Project Gantt chart: 
+ 
+
+
+ 
+Agreement
+
+This charter and accompanying deliverables have been mutually discussed and agreed by:
+
+Chandra Narra___________________		______________________________
+Project Mentor Name	(Client)				Project Mentor Signature (Client)
+
+
+Abhishek Khanna_________________		______________________________
+Team Member #1 Name				Team Member #1 Signature 
+
+Sonu Krishnan     _________________		______________________________
+Team Member #2 Name				Team Member #2 Signature 
+
+Sumit Janmejai __________________		______________________________
+Team Member #3 Name				Team Member #3 Signature 
+
+Venkata Pilla    __________________		______________________________
+Team Member #4 Name				Team Member #4 Signature 
+
+
+
+_______________________________		______________________________
+Faculty Advisor				 	CBA Department 
+
+ 
+Capstone Scope Change Request
+
+Name
+
+	Email Address
+
+
+Company
+
+	Telephone Number(s)
+
+
+
+Please describe the nature of the change requested:
+
+
+
+
+
+
+Approximately how many additional hours of effort will this change require?
+
+
+
+ 
+What other delays, costs, or risks would this change introduce?
+
+
+
+
+
+What part of remaining project work can be forgone to accommodate this change?
+
+
+
+
+
+Please email this form to reema_gupta@isb.edu
+Decision will be conveyed within one week.
+
+Student Team Recommendation: 
+
+ 
+Faculty Recommendations: 
+
+ 
+Other Considerations: 
+
+ 
+	
+       Accepted         Rejected
+
+ 
