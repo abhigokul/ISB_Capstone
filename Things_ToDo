@@ -1,3 +1,14 @@
+
+******************** START OF FILE *****************************************************************
+// FOLLOW FORMATIING
+// APPEND NEW TO-DO STUFF AT BEGINING OF FILE WITH A DATE STAMP
+
+
+######  11th Dec -15 ######
+
+//CREATED : 11th Dec-15
+//DUE DATE: 20th Dec-15
+
 Abhishek : 
 a)To work on code than can pull tweets for 1 type of security and dump data into CSV.
 b)To create a script that can pull data back in time upto timeline that twitter allows.
@@ -19,3 +30,4 @@ b) This  data to be dumped as core files , that later can be digested as suitabl
 c) to create a tableau graph/plot for the time series share data.
 d) develop insights on the plots generated , to mark the regions of interest.
 e) these insghts that can be compared against the sentimets collected for that time period for validation.
+********************************* END OF FILE *****************************************************************
