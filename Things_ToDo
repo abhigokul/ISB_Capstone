@@ -1,0 +1,21 @@
+Abhishek : 
+a)To work on code than can pull tweets for 1 type of security and dump data into CSV.
+b)To create a script that can pull data back in time upto timeline that twitter allows.
+c) scale that script to pull data every day upto the max allowed fetch limit.
+d) Dump the data as plain text files or csv , later to be imported into suitable DB.
+
+Sumit:
+a)To work on code that can fetch data from news accumulating sites , such as Google news etc.
+b) Dump the data as plain text files or csv , later to be imported into suitable DB.
+
+Sonu:
+a) work on algorith that can parse the text and return the sentiment assosiated with it.
+b) this algorith should be generic and should return the sentiment if ran on any plain paragraph text.
+c) Algorithm should return a score related to the intensity of the sentiment determined.
+
+Venkat:
+a) pull share price and related data on the securites relevant to the project.
+b) This  data to be dumped as core files , that later can be digested as suitable.
+c) to create a tableau graph/plot for the time series share data.
+d) develop insights on the plots generated , to mark the regions of interest.
+e) these insghts that can be compared against the sentimets collected for that time period for validation.
