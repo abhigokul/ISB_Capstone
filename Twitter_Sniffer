@@ -1,0 +1,120 @@
+############# Twitter Data Capture ###########
+#TO capture tweets related to Tesla , Ford and General Motors 
+####### Handles being sniffed #########
+### Tesla: #TeslaMotors #Tesla #TSLA
+### FORD: #ford #fordmotors 
+### General Motors: #generalmotors #gm 
+# Fetching required packages
+install.packages("twitteR")
+install.packages("RCurl")
+install.packages("RJSONIO")
+install.packages("stringr")
+install.packages('base64enc')
+install.packages('jsonlite')
+
+library(jsonlite)
+library(twitteR)
+library(RCurl)
+library(RJSONIO)
+library(stringr)
+library(base64enc)
+
+# Declare Twitter API Credentials
+api_key = "9besLwERF5I6UARDLVd1OjRBn" 
+api_secret = "6O9NlAp8owLS12IjZDZudOfDnmFAMgAfqpIaf9AqGUJM26Mkbm" 
+access_token = "141123071-s20Z93Nizv84W0h8WVMNeYJrMl8sEyzWfJpFqZfF" 
+token_secret = "7AB0Nw4fhEwmHhpHgeABj4ZBigfdnvXIyHpRxhBNEljCN" 
+
+# Create Twitter Connection
+setup_twitter_oauth(api_key, api_secret, access_token, token_secret)
+
+# Defining the securities to be captured
+securities = c("Ford","Tesla","General Motors")
+hastags = c("'ford' OR 'fordmotors' OR #ford OR #fordmotors",
+             "'TeslaMotors' OR 'Tesla' OR 'TSLA' OR #TeslaMotors OR #Tesla OR #TSLA",
+             "'GeneralMotors' OR 'GM' OR #generalmotors OR #gm")
+
+ford_dataFrame = data.frame()
+tesla_dataFrame = data.frame()
+generalmotors_dataFrame = data.frame()
+
+securities_toCapture = data.frame(securities,hastags)
+
+names(securities_toCapture) <- c("Security","HashTags") # variable names 
+
+##Tweet sniffing 
+
+#Capture previous data
+for(i in 1:nrow(securities_toCapture)) {
+  data <- securities_toCapture[i,]
+  cat(paste("********* Capturing Past Data for: ",data$Security," for tags: ",data$HashTags)," *********\n")
+  
+  tweets = searchTwitter(toString(data$HashTags) ,                     
+                         n=100, lang="en", maxID = data$TailId)
+  
+  switch(as.character(data$Security), 
+         'Ford'={
+           print("Updating Ford Data Frame")
+           ford_dataFrame = rbind(ford_dataFrame,twListToDF(tweets))
+           securities_toCapture[i,"HeadId"] = head(ford_dataFrame,n=1)["id"]
+           securities_toCapture[i,"TailId"] = tail(ford_dataFrame,n=1)["id"]
+         },
+         'Tesla'={
+           print("Updating Tesla Data Frame")
+           tesla_dataFrame = rbind(tesla_dataFrame,twListToDF(tweets))    
+           securities_toCapture[i,"HeadId"] = head(tesla_dataFrame,n=1)["id"]
+           securities_toCapture[i,"TailId"] = tail(tesla_dataFrame,n=1)["id"]
+         },
+         'General Motors'={
+           print("Updating General Motors Data Frame")
+           generalmotors_dataFrame = rbind(generalmotors_dataFrame,twListToDF(tweets))  
+           securities_toCapture[i,"HeadId"] = head(generalmotors_dataFrame,n=1)["id"]
+           securities_toCapture[i,"TailId"] = tail(generalmotors_dataFrame,n=1)["id"]
+         },
+         {
+           print('Invalid Security')
+         }
+  )
+ 
+  
+}
+
+#Keep hearing to new data
+for(i in 1:nrow(securities_toCapture)) {
+  
+  switch(as.character(data$Security), 
+         'Ford'={
+           print("Updating Ford Data Frame")
+           ford_dataFrame = rbind(ford_dataFrame,twListToDF(tweets))
+           securities_toCapture[i,"HeadId"] = head(ford_dataFrame,n=1)["id"]
+           securities_toCapture[i,"TailId"] = tail(ford_dataFrame,n=1)["id"]
+         },
+         'Tesla'={
+           print("Updating Tesla Data Frame")
+           tesla_dataFrame = rbind(tesla_dataFrame,twListToDF(tweets))    
+           securities_toCapture[i,"HeadId"] = head(tesla_dataFrame,n=1)["id"]
+           securities_toCapture[i,"TailId"] = tail(tesla_dataFrame,n=1)["id"]
+         },
+         'General Motors'={
+           print("Updating General Motors Data Frame")
+           generalmotors_dataFrame = rbind(generalmotors_dataFrame,twListToDF(tweets))  
+           securities_toCapture[i,"HeadId"] = head(generalmotors_dataFrame,n=1)["id"]
+           securities_toCapture[i,"TailId"] = tail(generalmotors_dataFrame,n=1)["id"]
+         },
+         {
+           print('Invalid Security')
+         }
+  )
+  # do stuff with row
+ # print(row$hastags)
+}
+
+tweets = searchTwitter("'ford'",                     
+                       n=100, lang="en", maxID = "673920022520193024")
+
+
+# Transform tweets list into a data frame
+tweets.df = rbind(tweets.df,twListToDF(tweets))
+myjson = toJSON(tweets.df, pretty = TRUE)
+
+save(myjson, file="test.JSON")
