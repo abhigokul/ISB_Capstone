@@ -11,6 +11,7 @@ install.packages("RJSONIO")
 install.packages("stringr")
 install.packages('base64enc')
 install.packages('jsonlite')
+install.packages("xlsx")
 
 library(jsonlite)
 library(twitteR)
@@ -18,6 +19,7 @@ library(RCurl)
 library(RJSONIO)
 library(stringr)
 library(base64enc)
+library(xlsx)
 
 # Declare Twitter API Credentials
 api_key = "9besLwERF5I6UARDLVd1OjRBn" 
@@ -25,14 +27,26 @@ api_secret = "6O9NlAp8owLS12IjZDZudOfDnmFAMgAfqpIaf9AqGUJM26Mkbm"
 access_token = "141123071-s20Z93Nizv84W0h8WVMNeYJrMl8sEyzWfJpFqZfF" 
 token_secret = "7AB0Nw4fhEwmHhpHgeABj4ZBigfdnvXIyHpRxhBNEljCN" 
 
+twitter_log = file("twitter_sniffer.log",open = "a")
+
+putMeTOSleepCounter_Ford = 0
+putMeTOSleepCounter_GM = 0
+putMeTOSleepCounter_Tesla = 0
+
+sleepCounter = 0
+keepCapturing = TRUE
+
+
 # Create Twitter Connection
 setup_twitter_oauth(api_key, api_secret, access_token, token_secret)
 
+cat(paste("** Creating Securties Data Frame ",Sys.Date()," **\n"),file=twitter_log)
+
 # Defining the securities to be captured
 securities = c("Ford","Tesla","General Motors")
-hastags = c("'ford' OR 'fordmotors' OR #ford OR #fordmotors",
+hastags = c("'fordmotors' OR #ford OR #fordmotors",
              "'TeslaMotors' OR 'Tesla' OR 'TSLA' OR #TeslaMotors OR #Tesla OR #TSLA",
-             "'GeneralMotors' OR 'GM' OR #generalmotors OR #gm")
+             "'GeneralMotors' OR #generalmotors OR #gm")
 
 ford_dataFrame = data.frame()
 tesla_dataFrame = data.frame()
@@ -44,77 +58,185 @@ names(securities_toCapture) <- c("Security","HashTags") # variable names
 
 ##Tweet sniffing 
 
-#Capture previous data
-for(i in 1:nrow(securities_toCapture)) {
-  data <- securities_toCapture[i,]
-  cat(paste("********* Capturing Past Data for: ",data$Security," for tags: ",data$HashTags)," *********\n")
+while(keepCapturing){
+    if(putMeTOSleepCounter_Ford == 3 & putMeTOSleepCounter_GM == 3 & putMeTOSleepCounter_Tesla == 3 ){
+      print("## Didnt get any data for last 3 tries.. Sleeping for 15 mins before retry.##")
+      cat("## Didnt get any data for last 3 tries.. Sleeping for 15 mins before retry. ##\n",file = twitter_log)
+      Sys.sleep(900)
+      putMeTOSleepCounter_Ford = 0
+      putMeTOSleepCounter_GM = 0
+      putMeTOSleepCounter_Tesla = 0
+      sleepCounter = sleepCounter + 1
+    }
+    if(sleepCounter == 3){
+      print("ERROR: Didnt fetch data after 15 mins of sleep 3 times , time to quit !!")
+      cat("ERROR: Didnt fetch data after 15 mins of sleep 3 times , time to quit !!\n",file = twitter_log)
+      keepCapturing = FALSE
+      break
+    }
   
-  tweets = searchTwitter(toString(data$HashTags) ,                     
-                         n=100, lang="en", maxID = data$TailId)
-  
-  switch(as.character(data$Security), 
-         'Ford'={
-           print("Updating Ford Data Frame")
-           ford_dataFrame = rbind(ford_dataFrame,twListToDF(tweets))
-           securities_toCapture[i,"HeadId"] = head(ford_dataFrame,n=1)["id"]
-           securities_toCapture[i,"TailId"] = tail(ford_dataFrame,n=1)["id"]
-         },
-         'Tesla'={
-           print("Updating Tesla Data Frame")
-           tesla_dataFrame = rbind(tesla_dataFrame,twListToDF(tweets))    
-           securities_toCapture[i,"HeadId"] = head(tesla_dataFrame,n=1)["id"]
-           securities_toCapture[i,"TailId"] = tail(tesla_dataFrame,n=1)["id"]
-         },
-         'General Motors'={
-           print("Updating General Motors Data Frame")
-           generalmotors_dataFrame = rbind(generalmotors_dataFrame,twListToDF(tweets))  
-           securities_toCapture[i,"HeadId"] = head(generalmotors_dataFrame,n=1)["id"]
-           securities_toCapture[i,"TailId"] = tail(generalmotors_dataFrame,n=1)["id"]
-         },
-         {
-           print('Invalid Security')
-         }
-  )
- 
-  
+      #Capture previous data
+    for(i in 1:nrow(securities_toCapture)) {
+      data <- securities_toCapture[i,]
+     
+      temp_dataFrame = data.frame()
+     
+      switch(as.character(data$Security), 
+             'Ford'={
+               if(putMeTOSleepCounter_Ford == 3){
+                 cat(paste("WARNING: No data fetched for last 3 tries for ",data$Security,", skipping it!!\n"))
+                 cat(paste("WARNING: No data fetched for last 3 tries for ",data$Security,", skipping it !!\n"),file = twitter_log)
+                 next
+               }
+               
+               cat(paste("********* Capturing Past Data for: ",data$Security," for tags: ",data$HashTags)," *********\n")
+               cat(paste("********* Capturing Past Data for: ",data$Security," for tags: ",data$HashTags)," *********\n",file = twitter_log)
+               
+               tweets = searchTwitter(toString(data$HashTags) ,                     
+                                      n=100, lang="en", maxID = data$TailId)
+               temp_dataFrame = twListToDF(tweets)
+               
+               
+               cat(paste("*** Fetched : ",nrow(temp_dataFrame)," tweets for Security: ",data$Security)," *** \n")
+               cat(paste("*** Fetched : ",nrow(temp_dataFrame)," tweets for Security: ",data$Security)," *** \n",file = twitter_log)
+               
+               if(nrow(temp_dataFrame) == 1 ){
+                 print(" ** Insufficient tweets ** Skipping this iteration")
+                 cat(" ** Insufficient tweets ** Skipping this iteration\n",file = twitter_log)
+                 putMeTOSleepCounter_Ford = putMeTOSleepCounter_Ford + 1
+                 next
+               }
+              
+               print("Updating Ford Data Frame")
+               cat("Updating Ford Data Frame\n",file = twitter_log)
+               
+               ford_dataFrame = rbind(ford_dataFrame,temp_dataFrame)
+               securities_toCapture[i,"HeadId"] = head(ford_dataFrame,n=1)["id"]
+               securities_toCapture[i,"TailId"] = tail(ford_dataFrame,n=1)["id"]
+               
+               if(nrow(ford_dataFrame) %% 500 == 0){
+                 print("##### Dumping Ford Data Frame Checkpoint#####")
+                 cat(paste("##### Dumping Ford Data Frame Checkpoint#",nrow(ford_dataFrame) %/% 500, "#####\n"),file = twitter_log)
+                 write.xlsx(ford_dataFrame,paste("Ford",nrow(ford_dataFrame) %/% 500,".xlsx",sep = ""))
+               }
+             },
+             'Tesla'={
+               if(putMeTOSleepCounter_Tesla == 3){
+                 cat(paste("WARNING: No data fetched for last 3 tries for ",data$Security,", skipping it!!\n"))
+                 cat(paste("WARNING: No data fetched for last 3 tries for ",data$Security,", skipping it !!\n"),file = twitter_log)
+                 next
+               }
+               
+               cat(paste("********* Capturing Past Data for: ",data$Security," for tags: ",data$HashTags)," *********\n")
+               cat(paste("********* Capturing Past Data for: ",data$Security," for tags: ",data$HashTags)," *********\n",file = twitter_log)
+               
+               tweets = searchTwitter(toString(data$HashTags) ,                     
+                                      n=100, lang="en", maxID = data$TailId)
+               temp_dataFrame = twListToDF(tweets)
+               
+               cat(paste("*** Fetched : ",nrow(temp_dataFrame)," tweets for Security: ",data$Security)," *** \n")
+               cat(paste("*** Fetched : ",nrow(temp_dataFrame)," tweets for Security: ",data$Security)," *** \n",file = twitter_log)
+               
+               if(nrow(temp_dataFrame) == 1 ){
+                 print(" ** Insufficient tweets ** Skipping this iteration")
+                 cat(" ** Insufficient tweets ** Skipping this iteration\n",file = twitter_log)
+                 putMeTOSleepCounter_Tesla = putMeTOSleepCounter_Tesla + 1
+                 next
+               }
+               
+               print("Updating Tesla Data Frame")
+               cat("Updating Tesla Data Frame\n",file = twitter_log)
+               
+               tesla_dataFrame = rbind(tesla_dataFrame,temp_dataFrame)    
+               securities_toCapture[i,"HeadId"] = head(tesla_dataFrame,n=1)["id"]
+               securities_toCapture[i,"TailId"] = tail(tesla_dataFrame,n=1)["id"]
+               
+               
+               if(nrow(tesla_dataFrame) %% 500 == 0){
+                 print("##### Dumping Tesla Data Frame Checkpoint#####")
+                 cat(paste("##### Dumping Tesla Data Frame Checkpoint#",nrow(tesla_dataFrame) %/% 500, "#####\n"),file = twitter_log)
+                 write.xlsx(tesla_dataFrame,paste("Tesla",nrow(tesla_dataFrame) %/% 500,".xlsx",sep = ""))
+               }
+             },
+             'General Motors'={
+               if(putMeTOSleepCounter_GM == 3){
+                 cat(paste("WARNING: No data fetched for last 3 tries for ",data$Security,", skipping it!!\n"))
+                 cat(paste("WARNING: No data fetched for last 3 tries for ",data$Security,", skipping it !!\n"),file = twitter_log)
+                 next
+               }
+               
+               cat(paste("********* Capturing Past Data for: ",data$Security," for tags: ",data$HashTags)," *********\n")
+               cat(paste("********* Capturing Past Data for: ",data$Security," for tags: ",data$HashTags)," *********\n",file = twitter_log)
+               
+               tweets = searchTwitter(toString(data$HashTags) ,                     
+                                      n=100, lang="en", maxID = data$TailId)
+               temp_dataFrame = twListToDF(tweets)
+               
+               cat(paste("*** Fetched : ",nrow(temp_dataFrame)," tweets for Security: ",data$Security)," *** \n")
+               cat(paste("*** Fetched : ",nrow(temp_dataFrame)," tweets for Security: ",data$Security)," *** \n",file = twitter_log)
+               
+               if(nrow(temp_dataFrame) == 1 ){
+                 print(" ** Insufficient tweets ** Skipping this iteration")
+                 cat(" ** Insufficient tweets ** Skipping this iteration\n",file = twitter_log)
+                 putMeTOSleepCounter_GM = putMeTOSleepCounter_GM + 1
+                 next
+               }
+               
+               print("Updating General Motors Data Frame")
+               cat("Updating General Motors Data Frame\n",file = twitter_log)
+               
+               generalmotors_dataFrame = rbind(generalmotors_dataFrame,temp_dataFrame)  
+               securities_toCapture[i,"HeadId"] = head(generalmotors_dataFrame,n=1)["id"]
+               securities_toCapture[i,"TailId"] = tail(generalmotors_dataFrame,n=1)["id"]
+               
+               if(nrow(generalmotors_dataFrame) %% 500 == 0){
+                 print("##### Dumping GM Data Frame Checkpoint#####")
+                 cat(paste("##### Dumping GM Data Frame Checkpoint#",nrow(generalmotors_dataFrame) %/% 500, "#####\n"),file = twitter_log)
+                 write.xlsx(generalmotors_dataFrame,paste("GM",nrow(generalmotors_dataFrame) %/% 500,".xlsx",sep = ""))
+               }
+             },
+             {
+               print('Invalid Security')
+               cat("!!!!!!!!!!!Invalid Security!!!!!!!!\n",file = twitter_log)
+             }
+      )
+    }
 }
 
-#Keep hearing to new data
-for(i in 1:nrow(securities_toCapture)) {
-  
-  switch(as.character(data$Security), 
-         'Ford'={
-           print("Updating Ford Data Frame")
-           ford_dataFrame = rbind(ford_dataFrame,twListToDF(tweets))
-           securities_toCapture[i,"HeadId"] = head(ford_dataFrame,n=1)["id"]
-           securities_toCapture[i,"TailId"] = tail(ford_dataFrame,n=1)["id"]
-         },
-         'Tesla'={
-           print("Updating Tesla Data Frame")
-           tesla_dataFrame = rbind(tesla_dataFrame,twListToDF(tweets))    
-           securities_toCapture[i,"HeadId"] = head(tesla_dataFrame,n=1)["id"]
-           securities_toCapture[i,"TailId"] = tail(tesla_dataFrame,n=1)["id"]
-         },
-         'General Motors'={
-           print("Updating General Motors Data Frame")
-           generalmotors_dataFrame = rbind(generalmotors_dataFrame,twListToDF(tweets))  
-           securities_toCapture[i,"HeadId"] = head(generalmotors_dataFrame,n=1)["id"]
-           securities_toCapture[i,"TailId"] = tail(generalmotors_dataFrame,n=1)["id"]
-         },
-         {
-           print('Invalid Security')
-         }
-  )
-  # do stuff with row
- # print(row$hastags)
-}
 
-tweets = searchTwitter("'ford'",                     
-                       n=100, lang="en", maxID = "673920022520193024")
+  #Dump Data frames to Files
+  for(i in 1:nrow(securities_toCapture)) {
+    data <- securities_toCapture[i,]
+    
+    switch(as.character(data$Security), 
+           'Ford'={
+             print("##### Dumping Ford Data Frame #####")
+             cat("##### Dumping Ford Data Frame #####\n",file = twitter_log)
+             write.xlsx(ford_dataFrame,"Ford_Final.xlsx")
+             #myjson = toJSON(ford_dataFrame, pretty = TRUE)
+             #save(myjson, file=paste("Ford",Sys.Time(),".xlsx",sep = ""))
+           },
+           'Tesla'={
+             print("##### Dumping Tesla Data Frame #####")
+             cat("##### Dumping Tesla Data Frame #####\n",file = twitter_log)
+             write.xlsx(ford_dataFrame,"Tesla_Final.xlsx")
+           },
+           'General Motors'={
+             print("##### Dumping GM Data Frame #####")
+             cat("##### Dumping GM Data Frame #####\n",file = twitter_log)
+             write.xlsx(ford_dataFrame,"GM_Final.xlsx")
+           },
+           {
+             print('Invalid Security')
+           }
+    )
+    # do stuff with row
+   # print(row$hastags)
+  }
+
+#Close the log file
+close(twitter_log)
 
 
-# Transform tweets list into a data frame
-tweets.df = rbind(tweets.df,twListToDF(tweets))
-myjson = toJSON(tweets.df, pretty = TRUE)
 
-save(myjson, file="test.JSON")
+
