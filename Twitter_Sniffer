@@ -219,12 +219,12 @@ while(keepCapturing){
            'Tesla'={
              print("##### Dumping Tesla Data Frame #####")
              cat("##### Dumping Tesla Data Frame #####\n",file = twitter_log)
-             write.xlsx(ford_dataFrame,"Tesla_Final.xlsx")
+             write.xlsx(tesla_dataFrame,"Tesla_Final.xlsx")
            },
            'General Motors'={
              print("##### Dumping GM Data Frame #####")
              cat("##### Dumping GM Data Frame #####\n",file = twitter_log)
-             write.xlsx(ford_dataFrame,"GM_Final.xlsx")
+             write.xlsx(generalmotors_dataFrame,"GM_Final.xlsx")
            },
            {
              print('Invalid Security')
